@@ -1,12 +1,29 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Suspense } from 'react';
+import { GameScene } from '@/components/game/GameScene';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { InstructionsOverlay } from '@/components/ui/InstructionsOverlay';
+import { PortfolioPanel } from '@/components/ui/PortfolioPanel';
+import { GameHUD } from '@/components/ui/GameHUD';
+import { MobileFallback } from '@/components/ui/MobileFallback';
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="relative w-full h-screen overflow-hidden">
+      {/* Loading Screen */}
+      <LoadingScreen />
+      
+      {/* Mobile Fallback */}
+      <MobileFallback />
+      
+      {/* Main 3D Game */}
+      <Suspense fallback={null}>
+        <GameScene />
+      </Suspense>
+      
+      {/* UI Overlays */}
+      <InstructionsOverlay />
+      <GameHUD />
+      <PortfolioPanel />
     </div>
   );
 };
