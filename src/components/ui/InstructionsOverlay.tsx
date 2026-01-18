@@ -1,4 +1,5 @@
 import { useGameStore } from '@/stores/gameStore';
+import { Gamepad2, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
 export const InstructionsOverlay = () => {
   const showInstructions = useGameStore((state) => state.showInstructions);
@@ -8,50 +9,87 @@ export const InstructionsOverlay = () => {
   if (isLoading || !showInstructions) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-slide-up">
-      <div className="glass-panel p-8 max-w-lg mx-4">
-        <h2 className="text-3xl font-bold gradient-text mb-6 text-center">
-          Welcome to My Portfolio
-        </h2>
+    <div className="fixed inset-0 z-40 flex items-center justify-center animate-fade-in">
+      {/* Backdrop with blur */}
+      <div className="absolute inset-0 bg-background/85 backdrop-blur-md" />
+      
+      {/* Content */}
+      <div className="relative glass-panel p-8 md:p-10 max-w-xl mx-4 animate-scale-in">
+        {/* Header */}
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <Gamepad2 className="w-8 h-8 text-primary" />
+          <h2 className="text-3xl md:text-4xl font-bold gradient-text">
+            Welcome
+          </h2>
+        </div>
         
-        <p className="text-muted-foreground mb-6 text-center">
+        <p className="text-muted-foreground mb-8 text-center text-lg">
           Explore this 3D world to discover my work, skills, and experience!
         </p>
 
-        <div className="space-y-4 mb-8">
-          <div className="flex items-center gap-4">
-            <div className="flex gap-1">
-              <span className="instruction-key">W</span>
-              <span className="instruction-key">A</span>
-              <span className="instruction-key">S</span>
-              <span className="instruction-key">D</span>
+        {/* Controls grid */}
+        <div className="grid gap-5 mb-8">
+          {/* Movement controls */}
+          <div className="glass-panel p-4 rounded-xl">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Movement</h3>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex gap-1 justify-center">
+                  <span className="instruction-key">W</span>
+                </div>
+                <div className="flex gap-1">
+                  <span className="instruction-key">A</span>
+                  <span className="instruction-key">S</span>
+                  <span className="instruction-key">D</span>
+                </div>
+              </div>
+              <span className="text-muted-foreground text-2xl">or</span>
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex gap-1 justify-center">
+                  <span className="instruction-key"><ArrowUp className="w-4 h-4" /></span>
+                </div>
+                <div className="flex gap-1">
+                  <span className="instruction-key"><ArrowLeft className="w-4 h-4" /></span>
+                  <span className="instruction-key"><ArrowDown className="w-4 h-4" /></span>
+                  <span className="instruction-key"><ArrowRight className="w-4 h-4" /></span>
+                </div>
+              </div>
             </div>
-            <span className="text-foreground">or Arrow keys to move</span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="instruction-key">Space</span>
-            <span className="text-foreground">to jump</span>
+          {/* Action controls */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="glass-panel p-4 rounded-xl text-center">
+              <span className="instruction-key mb-2 inline-block px-6">Space</span>
+              <p className="text-sm text-muted-foreground mt-2">Jump</p>
+            </div>
+            <div className="glass-panel p-4 rounded-xl text-center">
+              <span className="instruction-key mb-2 inline-block px-6">Shift</span>
+              <p className="text-sm text-muted-foreground mt-2">Boost</p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="instruction-key">Shift</span>
-            <span className="text-foreground">to boost</span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <span className="instruction-key">🖱️ Drag</span>
-            <span className="text-foreground">to rotate camera</span>
+          {/* Camera control */}
+          <div className="glass-panel p-4 rounded-xl flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
+              <span className="text-2xl">🖱️</span>
+            </div>
+            <div>
+              <p className="font-medium">Click & Drag</p>
+              <p className="text-sm text-muted-foreground">Rotate camera view</p>
+            </div>
           </div>
         </div>
 
-        <div className="text-center text-sm text-muted-foreground mb-6">
-          Drive to the glowing markers to explore different sections
+        {/* Tip */}
+        <div className="text-center text-sm text-muted-foreground mb-6 p-3 rounded-lg bg-primary/5 border border-primary/10">
+          <span className="text-primary">✨</span> Drive to the glowing markers to explore different sections
         </div>
 
+        {/* Start button */}
         <button
           onClick={() => setShowInstructions(false)}
-          className="btn-primary w-full text-primary-foreground font-semibold"
+          className="btn-primary w-full text-primary-foreground font-semibold text-lg py-4 rounded-xl"
         >
           Start Exploring 🚀
         </button>
