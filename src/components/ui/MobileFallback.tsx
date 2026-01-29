@@ -1,19 +1,32 @@
-import { useEffect } from 'react';
-import { useGameStore } from '@/stores/gameStore';
+import { useEffect, useState } from 'react';
 
 export const MobileFallback = () => {
-  const isMobile = useGameStore((state) => state.isMobile);
-  const setIsMobile = useGameStore((state) => state.setIsMobile);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+      const mobile = window.innerWidth < 768 || 
+        ('ontouchstart' in window && window.innerWidth < 1024) ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(mobile);
     };
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, [setIsMobile]);
+  }, []);
+
+  // Show loading state until we determine device type
+  if (isMobile === null) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4 animate-bounce">🚗</div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isMobile) return null;
 
@@ -132,3 +145,5 @@ export const MobileFallback = () => {
     </div>
   );
 };
+
+export default MobileFallback;
