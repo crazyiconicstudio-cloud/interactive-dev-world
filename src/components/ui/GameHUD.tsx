@@ -1,7 +1,11 @@
 import { useGameStore } from '@/stores/gameStore';
 import { Volume2, VolumeX, HelpCircle, Gauge } from 'lucide-react';
 
-export const GameHUD = () => {
+interface GameHUDProps {
+  isMobile?: boolean;
+}
+
+export const GameHUD = ({ isMobile = false }: GameHUDProps) => {
   const isMuted = useGameStore((state) => state.isMuted);
   const toggleMute = useGameStore((state) => state.toggleMute);
   const setShowInstructions = useGameStore((state) => state.setShowInstructions);
@@ -63,34 +67,36 @@ export const GameHUD = () => {
         </div>
       </div>
 
-      {/* Bottom left - Mini controls hint */}
-      <div className="fixed bottom-6 left-6 z-20 glass-panel px-4 py-3">
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-1 justify-center">
-              <kbd className="instruction-key text-xs px-2 py-0.5 min-w-[1.5rem] h-6">W</kbd>
+      {/* Bottom left - Mini controls hint (desktop only) */}
+      {!isMobile && (
+        <div className="fixed bottom-6 left-6 z-20 glass-panel px-4 py-3">
+          <div className="flex items-center gap-4 text-sm">
+            <div className="flex flex-col gap-1">
+              <div className="flex gap-1 justify-center">
+                <kbd className="instruction-key text-xs px-2 py-0.5 min-w-[1.5rem] h-6">W</kbd>
+              </div>
+              <div className="flex gap-1">
+                <kbd className="instruction-key text-xs px-2 py-0.5 min-w-[1.5rem] h-6">A</kbd>
+                <kbd className="instruction-key text-xs px-2 py-0.5 min-w-[1.5rem] h-6">S</kbd>
+                <kbd className="instruction-key text-xs px-2 py-0.5 min-w-[1.5rem] h-6">D</kbd>
+              </div>
             </div>
-            <div className="flex gap-1">
-              <kbd className="instruction-key text-xs px-2 py-0.5 min-w-[1.5rem] h-6">A</kbd>
-              <kbd className="instruction-key text-xs px-2 py-0.5 min-w-[1.5rem] h-6">S</kbd>
-              <kbd className="instruction-key text-xs px-2 py-0.5 min-w-[1.5rem] h-6">D</kbd>
+            <div className="text-muted-foreground text-xs">
+              <p>Move</p>
             </div>
-          </div>
-          <div className="text-muted-foreground text-xs">
-            <p>Move</p>
-          </div>
-          <div className="w-px h-8 bg-border" />
-          <div className="flex flex-col gap-1 items-center">
-            <kbd className="instruction-key text-xs px-2 py-0.5 h-6">Space</kbd>
-            <span className="text-muted-foreground text-xs">Jump</span>
-          </div>
-          <div className="w-px h-8 bg-border" />
-          <div className="flex flex-col gap-1 items-center">
-            <kbd className="instruction-key text-xs px-2 py-0.5 h-6">Shift</kbd>
-            <span className="text-muted-foreground text-xs">Boost</span>
+            <div className="w-px h-8 bg-border" />
+            <div className="flex flex-col gap-1 items-center">
+              <kbd className="instruction-key text-xs px-2 py-0.5 h-6">Space</kbd>
+              <span className="text-muted-foreground text-xs">Jump</span>
+            </div>
+            <div className="w-px h-8 bg-border" />
+            <div className="flex flex-col gap-1 items-center">
+              <kbd className="instruction-key text-xs px-2 py-0.5 h-6">Shift</kbd>
+              <span className="text-muted-foreground text-xs">Boost</span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Center top - Compass/Direction indicator */}
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-20">

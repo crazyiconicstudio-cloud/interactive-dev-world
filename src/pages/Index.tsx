@@ -4,10 +4,12 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { InstructionsOverlay } from '@/components/ui/InstructionsOverlay';
 import { PortfolioPanel } from '@/components/ui/PortfolioPanel';
 import { GameHUD } from '@/components/ui/GameHUD';
-import { MobileFallback } from '@/components/ui/MobileFallback';
+import { TouchControls } from '@/components/ui/TouchControls';
+import { useTouchControls } from '@/hooks/useTouchControls';
 
 const Index = () => {
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const { controls: touchControls, updateControls } = useTouchControls();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -18,6 +20,8 @@ const Index = () => {
     };
     
     checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Wait until we know if it's mobile
@@ -32,23 +36,20 @@ const Index = () => {
     );
   }
 
-  // Show mobile fallback for mobile devices
-  if (isMobile) {
-    return <MobileFallback />;
-  }
-
-  // Desktop: Show full 3D experience
   return (
     <div className="relative w-full h-screen overflow-hidden">
       <LoadingScreen />
       
       <Suspense fallback={null}>
-        <GameScene />
+        <GameScene isMobile={isMobile} touchControls={touchControls} />
       </Suspense>
       
-      <InstructionsOverlay />
-      <GameHUD />
+      <InstructionsOverlay isMobile={isMobile} />
+      <GameHUD isMobile={isMobile} />
       <PortfolioPanel />
+      
+      {/* Touch controls for mobile */}
+      {isMobile && <TouchControls onControlChange={updateControls} />}
     </div>
   );
 };

@@ -6,9 +6,10 @@ interface CameraControllerProps {
   target: THREE.Vector3;
   carRotation?: number;
   carVelocity?: number;
+  isMobile?: boolean;
 }
 
-export const CameraController = ({ target, carRotation = 0, carVelocity = 0 }: CameraControllerProps) => {
+export const CameraController = ({ target, carRotation = 0, carVelocity = 0, isMobile = false }: CameraControllerProps) => {
   const { camera } = useThree();
   const currentPosition = useRef(new THREE.Vector3(0, 8, 12));
   const currentLookAt = useRef(new THREE.Vector3());
@@ -17,8 +18,10 @@ export const CameraController = ({ target, carRotation = 0, carVelocity = 0 }: C
   const tiltAngle = useRef(0);
   const shakeOffset = useRef(new THREE.Vector3());
   const lastVelocity = useRef(0);
+  const lastTouchPos = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    // Mouse controls for desktop
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button === 0 || e.button === 2) {
         isDragging.current = true;
@@ -36,20 +39,59 @@ export const CameraController = ({ target, carRotation = 0, carVelocity = 0 }: C
       }
     };
 
+    // Touch controls for mobile
+    const handleTouchStart = (e: TouchEvent) => {
+      // Only track touches on the right side of screen (left side is joystick)
+      const touch = e.touches[0];
+      if (touch.clientX > window.innerWidth * 0.4) {
+        isDragging.current = true;
+        lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
+      }
+    };
+
+    const handleTouchEnd = () => {
+      isDragging.current = false;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging.current) return;
+      
+      const touch = e.touches[0];
+      if (touch.clientX > window.innerWidth * 0.4) {
+        const deltaX = touch.clientX - lastTouchPos.current.x;
+        const deltaY = touch.clientY - lastTouchPos.current.y;
+        
+        mouseOffset.current.x += deltaX * 0.008;
+        mouseOffset.current.y = Math.max(-0.5, Math.min(0.5, mouseOffset.current.y - deltaY * 0.004));
+        
+        lastTouchPos.current = { x: touch.clientX, y: touch.clientY };
+      }
+    };
+
     const handleContextMenu = (e: Event) => e.preventDefault();
 
+    // Add event listeners
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('contextmenu', handleContextMenu);
+    
+    if (isMobile) {
+      window.addEventListener('touchstart', handleTouchStart, { passive: true });
+      window.addEventListener('touchend', handleTouchEnd, { passive: true });
+      window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    }
 
     return () => {
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, []);
+  }, [isMobile]);
 
   useFrame((state, delta) => {
     // Calculate desired camera position with orbit offset

@@ -203,11 +203,16 @@ const StreetLamp = ({ position }: { position: [number, number, number] }) => {
   );
 };
 
-export const Environment = () => {
-  // Generate random positions for trees
+interface EnvironmentProps {
+  isMobile?: boolean;
+}
+
+export const Environment = ({ isMobile = false }: EnvironmentProps) => {
+  // Generate random positions for trees (fewer on mobile)
   const trees = useMemo(() => {
     const positions: [number, number, number][] = [];
-    for (let i = 0; i < 45; i++) {
+    const treeCount = isMobile ? 20 : 45;
+    for (let i = 0; i < treeCount; i++) {
       let x, z;
       do {
         x = (Math.random() - 0.5) * 85;
@@ -216,29 +221,30 @@ export const Environment = () => {
       positions.push([x, 0, z]);
     }
     return positions;
-  }, []);
+  }, [isMobile]);
 
-  // Generate rocks
+  // Generate rocks (fewer on mobile)
   const rocks = useMemo(() => {
     const positions: { pos: [number, number, number]; scale: number }[] = [];
-    for (let i = 0; i < 18; i++) {
+    const rockCount = isMobile ? 8 : 18;
+    for (let i = 0; i < rockCount; i++) {
       const x = (Math.random() - 0.5) * 75;
       const z = (Math.random() - 0.5) * 75;
       positions.push({ pos: [x, 0.3, z], scale: 0.25 + Math.random() * 0.45 });
     }
     return positions;
-  }, []);
+  }, [isMobile]);
 
-  // Street lamp positions
-  const lampPositions: [number, number, number][] = [
-    [4, 0, 15], [-4, 0, 15], [4, 0, -15], [-4, 0, -15],
-    [15, 0, 4], [15, 0, -4], [-15, 0, 4], [-15, 0, -4],
-  ];
+  // Street lamp positions (fewer on mobile)
+  const lampPositions: [number, number, number][] = isMobile 
+    ? [[4, 0, 15], [-4, 0, -15], [15, 0, 4], [-15, 0, -4]]
+    : [[4, 0, 15], [-4, 0, 15], [4, 0, -15], [-4, 0, -15], [15, 0, 4], [15, 0, -4], [-15, 0, 4], [-15, 0, -4]];
 
-  // Grass patches for variation
+  // Grass patches for variation (fewer on mobile)
   const grassPatches = useMemo(() => {
     const patches: { pos: [number, number, number]; scale: number; rotation: number }[] = [];
-    for (let i = 0; i < 100; i++) {
+    const patchCount = isMobile ? 40 : 100;
+    for (let i = 0; i < patchCount; i++) {
       const x = (Math.random() - 0.5) * 90;
       const z = (Math.random() - 0.5) * 90;
       if (Math.abs(x) > 4 || Math.abs(z) > 4) {
@@ -250,7 +256,7 @@ export const Environment = () => {
       }
     }
     return patches;
-  }, []);
+  }, [isMobile]);
 
   return (
     <group>
