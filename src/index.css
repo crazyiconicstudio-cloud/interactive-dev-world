@@ -156,30 +156,12 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-@keyframes slide {
-  from { transform: translateX(0); }
-  to { transform: translateX(-20px); }
-}
-
 .animate-slide-up {
   animation: slide-up 0.5s ease-out forwards;
 }
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.animate-shimmer {
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
 }
 
 /* Hide scrollbar for fullscreen experience */
@@ -189,23 +171,6 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-}
-
-#root {
-  width: 100%;
-  height: 100%;
-}
-
-/* Custom scrollbar */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: hsl(25 20% 30%);
-  border-radius: 2px;
 }
 
 #root {

@@ -1,402 +1,145 @@
 import { RigidBody } from '@react-three/rapier';
 import { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-// Enhanced low-poly tree component
+// Low-poly tree component
 const Tree = ({ position }: { position: [number, number, number] }) => {
   const scale = 0.8 + Math.random() * 0.6;
-  const treeRef = useRef<THREE.Group>(null);
-  
-  // Subtle sway animation
-  useFrame((state) => {
-    if (treeRef.current) {
-      treeRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.5 + position[0]) * 0.02;
-    }
-  });
-
   return (
-    <group ref={treeRef} position={position} scale={scale}>
-      {/* Trunk with bark texture simulation */}
+    <group position={position} scale={scale}>
+      {/* Trunk */}
       <mesh position={[0, 1, 0]} castShadow>
-        <cylinderGeometry args={[0.12, 0.18, 2, 8]} />
-        <meshStandardMaterial 
-          color="#5d4037" 
-          roughness={0.95}
-          metalness={0.05}
-        />
+        <cylinderGeometry args={[0.15, 0.2, 2, 6]} />
+        <meshStandardMaterial color="#8B4513" roughness={0.9} />
       </mesh>
-      {/* Foliage layers with depth variation */}
+      {/* Foliage - stacked cones for low-poly look */}
       <mesh position={[0, 2.5, 0]} castShadow>
-        <coneGeometry args={[1.3, 2.2, 8]} />
-        <meshStandardMaterial 
-          color="#1b5e20" 
-          roughness={0.85}
-          metalness={0.05}
-        />
+        <coneGeometry args={[1.2, 2, 6]} />
+        <meshStandardMaterial color="#228B22" roughness={0.8} />
       </mesh>
-      <mesh position={[0, 3.6, 0]} castShadow>
-        <coneGeometry args={[1.0, 1.7, 8]} />
-        <meshStandardMaterial 
-          color="#2e7d32" 
-          roughness={0.85}
-        />
+      <mesh position={[0, 3.5, 0]} castShadow>
+        <coneGeometry args={[0.9, 1.5, 6]} />
+        <meshStandardMaterial color="#2E8B2E" roughness={0.8} />
       </mesh>
-      <mesh position={[0, 4.5, 0]} castShadow>
-        <coneGeometry args={[0.6, 1.2, 8]} />
-        <meshStandardMaterial 
-          color="#43a047" 
-          roughness={0.85}
-        />
+      <mesh position={[0, 4.3, 0]} castShadow>
+        <coneGeometry args={[0.5, 1, 6]} />
+        <meshStandardMaterial color="#32CD32" roughness={0.8} />
       </mesh>
     </group>
   );
 };
 
-// Enhanced building with windows and gradients
+// Low-poly building component
 const Building = ({ position, height, color }: { position: [number, number, number]; height: number; color: string }) => {
-  const windowGlowIntensity = useRef(0);
-  
-  useFrame((state) => {
-    windowGlowIntensity.current = 0.3 + Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
-  });
-
   return (
     <RigidBody type="fixed" position={position} colliders="cuboid">
-      {/* Main building body */}
       <mesh castShadow receiveShadow position={[0, height / 2, 0]}>
         <boxGeometry args={[3, height, 3]} />
-        <meshStandardMaterial 
-          color={color} 
-          roughness={0.7}
-          metalness={0.1}
-        />
+        <meshStandardMaterial color={color} roughness={0.6} />
       </mesh>
-      
-      {/* Building trim/accent */}
-      <mesh castShadow position={[0, 0.1, 0]}>
-        <boxGeometry args={[3.1, 0.2, 3.1]} />
-        <meshStandardMaterial color="#555" roughness={0.8} metalness={0.2} />
-      </mesh>
-      
-      {/* Roof with slight overhang */}
-      <mesh castShadow position={[0, height + 0.2, 0]}>
-        <boxGeometry args={[3.3, 0.4, 3.3]} />
-        <meshStandardMaterial color="#3d3d3d" roughness={0.6} metalness={0.3} />
-      </mesh>
-      
-      {/* Roof top accent */}
+      {/* Roof */}
       <mesh castShadow position={[0, height + 0.5, 0]}>
-        <boxGeometry args={[2.5, 0.2, 2.5]} />
-        <meshStandardMaterial color="#4a4a4a" roughness={0.5} metalness={0.4} />
+        <boxGeometry args={[3.2, 0.3, 3.2]} />
+        <meshStandardMaterial color="#555" roughness={0.7} />
       </mesh>
-      
-      {/* Windows with glow effect */}
+      {/* Windows */}
       {Array.from({ length: Math.floor(height / 2) }).map((_, i) => (
         <group key={i}>
-          {/* Front windows */}
-          <mesh position={[0, 1.5 + i * 2, 1.51]}>
-            <planeGeometry args={[2, 0.8]} />
-            <meshStandardMaterial 
-              color="#1a237e" 
-              emissive="#4fc3f7" 
-              emissiveIntensity={0.4}
-              transparent
-              opacity={0.9}
-            />
+          <mesh position={[1.51, 1.5 + i * 2, 0]}>
+            <boxGeometry args={[0.02, 0.8, 0.6]} />
+            <meshStandardMaterial color="#87ceeb" emissive="#4a90d9" emissiveIntensity={0.2} />
           </mesh>
-          {/* Back windows */}
-          <mesh position={[0, 1.5 + i * 2, -1.51]} rotation={[0, Math.PI, 0]}>
-            <planeGeometry args={[2, 0.8]} />
-            <meshStandardMaterial 
-              color="#1a237e" 
-              emissive="#4fc3f7" 
-              emissiveIntensity={0.3}
-              transparent
-              opacity={0.9}
-            />
-          </mesh>
-          {/* Side windows */}
-          <mesh position={[1.51, 1.5 + i * 2, 0]} rotation={[0, Math.PI / 2, 0]}>
-            <planeGeometry args={[2, 0.8]} />
-            <meshStandardMaterial 
-              color="#1a237e" 
-              emissive="#ffb74d" 
-              emissiveIntensity={0.25 + (i % 2) * 0.15}
-              transparent
-              opacity={0.9}
-            />
-          </mesh>
-          <mesh position={[-1.51, 1.5 + i * 2, 0]} rotation={[0, -Math.PI / 2, 0]}>
-            <planeGeometry args={[2, 0.8]} />
-            <meshStandardMaterial 
-              color="#1a237e" 
-              emissive="#ffb74d" 
-              emissiveIntensity={0.25 + ((i + 1) % 2) * 0.15}
-              transparent
-              opacity={0.9}
-            />
+          <mesh position={[-1.51, 1.5 + i * 2, 0]}>
+            <boxGeometry args={[0.02, 0.8, 0.6]} />
+            <meshStandardMaterial color="#87ceeb" emissive="#4a90d9" emissiveIntensity={0.2} />
           </mesh>
         </group>
       ))}
-      
-      {/* Window light glow */}
-      <pointLight position={[0, height / 2, 2]} color="#4fc3f7" intensity={0.3} distance={5} />
     </RigidBody>
   );
 };
 
-// Enhanced rock with better shading
+// Rock component
 const Rock = ({ position, scale }: { position: [number, number, number]; scale: number }) => {
   return (
     <RigidBody type="fixed" position={position} colliders="hull">
       <mesh castShadow scale={scale}>
         <dodecahedronGeometry args={[1, 0]} />
-        <meshStandardMaterial 
-          color="#6d6d6d" 
-          roughness={0.95}
-          metalness={0.05}
-        />
-      </mesh>
-      {/* Secondary rock for variation */}
-      <mesh castShadow position={[0.3, -0.2, 0.2]} scale={scale * 0.6}>
-        <dodecahedronGeometry args={[1, 0]} />
-        <meshStandardMaterial 
-          color="#5a5a5a" 
-          roughness={0.9}
-        />
+        <meshStandardMaterial color="#777" roughness={0.9} />
       </mesh>
     </RigidBody>
   );
 };
 
-// Street lamp component
-const StreetLamp = ({ position }: { position: [number, number, number] }) => {
-  return (
-    <group position={position}>
-      {/* Pole */}
-      <mesh castShadow position={[0, 2, 0]}>
-        <cylinderGeometry args={[0.08, 0.1, 4, 8]} />
-        <meshStandardMaterial color="#2c2c2c" metalness={0.8} roughness={0.3} />
-      </mesh>
-      {/* Lamp arm */}
-      <mesh castShadow position={[0.4, 3.8, 0]} rotation={[0, 0, Math.PI / 4]}>
-        <cylinderGeometry args={[0.04, 0.04, 0.8, 6]} />
-        <meshStandardMaterial color="#2c2c2c" metalness={0.8} roughness={0.3} />
-      </mesh>
-      {/* Lamp head */}
-      <mesh castShadow position={[0.7, 3.9, 0]}>
-        <boxGeometry args={[0.3, 0.15, 0.2]} />
-        <meshStandardMaterial color="#3a3a3a" metalness={0.6} roughness={0.4} />
-      </mesh>
-      {/* Light bulb */}
-      <mesh position={[0.7, 3.8, 0]}>
-        <sphereGeometry args={[0.08, 8, 8]} />
-        <meshStandardMaterial 
-          color="#fff8e1" 
-          emissive="#ffcc80" 
-          emissiveIntensity={2}
-        />
-      </mesh>
-      <pointLight position={[0.7, 3.7, 0]} color="#ffcc80" intensity={1} distance={12} castShadow />
-    </group>
-  );
-};
-
-interface EnvironmentProps {
-  isMobile?: boolean;
-}
-
-export const Environment = ({ isMobile = false }: EnvironmentProps) => {
-  // Generate random positions for trees (fewer on mobile)
+export const Environment = () => {
+  // Generate random positions for trees
   const trees = useMemo(() => {
     const positions: [number, number, number][] = [];
-    const treeCount = isMobile ? 20 : 45;
-    for (let i = 0; i < treeCount; i++) {
+    for (let i = 0; i < 40; i++) {
       let x, z;
       do {
-        x = (Math.random() - 0.5) * 85;
-        z = (Math.random() - 0.5) * 85;
-      } while (Math.abs(x) < 8 && Math.abs(z) < 8);
+        x = (Math.random() - 0.5) * 80;
+        z = (Math.random() - 0.5) * 80;
+      } while (Math.abs(x) < 8 && Math.abs(z) < 8); // Keep clear area in center
       positions.push([x, 0, z]);
     }
     return positions;
-  }, [isMobile]);
+  }, []);
 
-  // Generate rocks (fewer on mobile)
+  // Generate rocks
   const rocks = useMemo(() => {
     const positions: { pos: [number, number, number]; scale: number }[] = [];
-    const rockCount = isMobile ? 8 : 18;
-    for (let i = 0; i < rockCount; i++) {
-      const x = (Math.random() - 0.5) * 75;
-      const z = (Math.random() - 0.5) * 75;
-      positions.push({ pos: [x, 0.3, z], scale: 0.25 + Math.random() * 0.45 });
+    for (let i = 0; i < 15; i++) {
+      const x = (Math.random() - 0.5) * 70;
+      const z = (Math.random() - 0.5) * 70;
+      positions.push({ pos: [x, 0.5, z], scale: 0.3 + Math.random() * 0.5 });
     }
     return positions;
-  }, [isMobile]);
-
-  // Street lamp positions (fewer on mobile)
-  const lampPositions: [number, number, number][] = isMobile 
-    ? [[4, 0, 15], [-4, 0, -15], [15, 0, 4], [-15, 0, -4]]
-    : [[4, 0, 15], [-4, 0, 15], [4, 0, -15], [-4, 0, -15], [15, 0, 4], [15, 0, -4], [-15, 0, 4], [-15, 0, -4]];
-
-  // Grass patches for variation (fewer on mobile)
-  const grassPatches = useMemo(() => {
-    const patches: { pos: [number, number, number]; scale: number; rotation: number }[] = [];
-    const patchCount = isMobile ? 40 : 100;
-    for (let i = 0; i < patchCount; i++) {
-      const x = (Math.random() - 0.5) * 90;
-      const z = (Math.random() - 0.5) * 90;
-      if (Math.abs(x) > 4 || Math.abs(z) > 4) {
-        patches.push({ 
-          pos: [x, 0.02, z], 
-          scale: 1 + Math.random() * 2,
-          rotation: Math.random() * Math.PI
-        });
-      }
-    }
-    return patches;
-  }, [isMobile]);
+  }, []);
 
   return (
     <group>
-      {/* Main ground plane with grass texture simulation */}
+      {/* Ground plane */}
       <RigidBody type="fixed" colliders="cuboid">
         <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, 0, 0]}>
           <planeGeometry args={[100, 100]} />
-          <meshStandardMaterial 
-            color="#3d6b41" 
-            roughness={0.95}
-            metalness={0.02}
-          />
+          <meshStandardMaterial color="#4a7c4e" roughness={0.9} />
         </mesh>
       </RigidBody>
 
-      {/* Grass variation patches */}
-      {grassPatches.map((patch, i) => (
-        <mesh 
-          key={`grass-${i}`} 
-          rotation={[-Math.PI / 2, patch.rotation, 0]} 
-          position={patch.pos}
-        >
-          <circleGeometry args={[patch.scale, 6]} />
-          <meshStandardMaterial 
-            color={i % 2 === 0 ? "#4a7c4e" : "#2d5a30"} 
-            roughness={0.95}
-            transparent
-            opacity={0.7}
-          />
-        </mesh>
-      ))}
-
-      {/* Roads with asphalt texture */}
+      {/* Roads - Main cross */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
-        <planeGeometry args={[6.5, 100]} />
-        <meshStandardMaterial 
-          color="#2a2a2a" 
-          roughness={0.85}
-          metalness={0.05}
-        />
+        <planeGeometry args={[6, 100]} />
+        <meshStandardMaterial color="#333" roughness={0.8} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
-        <planeGeometry args={[100, 6.5]} />
-        <meshStandardMaterial 
-          color="#2a2a2a" 
-          roughness={0.85}
-          metalness={0.05}
-        />
+        <planeGeometry args={[100, 6]} />
+        <meshStandardMaterial color="#333" roughness={0.8} />
       </mesh>
 
-      {/* Road edges/curbs */}
-      <mesh position={[-3.4, 0.05, 0]}>
-        <boxGeometry args={[0.15, 0.1, 100]} />
-        <meshStandardMaterial color="#666" roughness={0.9} />
-      </mesh>
-      <mesh position={[3.4, 0.05, 0]}>
-        <boxGeometry args={[0.15, 0.1, 100]} />
-        <meshStandardMaterial color="#666" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0.05, -3.4]}>
-        <boxGeometry args={[100, 0.1, 0.15]} />
-        <meshStandardMaterial color="#666" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0.05, 3.4]}>
-        <boxGeometry args={[100, 0.1, 0.15]} />
-        <meshStandardMaterial color="#666" roughness={0.9} />
-      </mesh>
-
-      {/* Center lane markings (yellow) */}
-      {Array.from({ length: 25 }).map((_, i) => (
-        <mesh key={`center-h-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[-48 + i * 4, 0.02, 0]}>
-          <planeGeometry args={[1.8, 0.12]} />
-          <meshStandardMaterial color="#f9a825" emissive="#f9a825" emissiveIntensity={0.1} />
+      {/* Road markings */}
+      {Array.from({ length: 20 }).map((_, i) => (
+        <mesh key={`line-h-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[-45 + i * 5, 0.02, 0]}>
+          <planeGeometry args={[2, 0.2]} />
+          <meshStandardMaterial color="#fff" />
         </mesh>
       ))}
-      {Array.from({ length: 25 }).map((_, i) => (
-        <mesh key={`center-v-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, -48 + i * 4]}>
-          <planeGeometry args={[0.12, 1.8]} />
-          <meshStandardMaterial color="#f9a825" emissive="#f9a825" emissiveIntensity={0.1} />
+      {Array.from({ length: 20 }).map((_, i) => (
+        <mesh key={`line-v-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, -45 + i * 5]}>
+          <planeGeometry args={[0.2, 2]} />
+          <meshStandardMaterial color="#fff" />
         </mesh>
       ))}
 
-      {/* Side lane markings (white) */}
-      {Array.from({ length: 12 }).map((_, i) => (
-        <group key={`side-marks-${i}`}>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-48 + i * 8, 0.02, 2.5]}>
-            <planeGeometry args={[3, 0.15]} />
-            <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.05} />
-          </mesh>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-48 + i * 8, 0.02, -2.5]}>
-            <planeGeometry args={[3, 0.15]} />
-            <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.05} />
-          </mesh>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[2.5, 0.02, -48 + i * 8]}>
-            <planeGeometry args={[0.15, 3]} />
-            <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.05} />
-          </mesh>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-2.5, 0.02, -48 + i * 8]}>
-            <planeGeometry args={[0.15, 3]} />
-            <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.05} />
-          </mesh>
-        </group>
-      ))}
-
-      {/* Crosswalk at intersection */}
-      {Array.from({ length: 8 }).map((_, i) => (
-        <group key={`crosswalk-${i}`}>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-2.8 + i * 0.8, 0.025, 4]}>
-            <planeGeometry args={[0.5, 2]} />
-            <meshStandardMaterial color="#ffffff" />
-          </mesh>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-2.8 + i * 0.8, 0.025, -4]}>
-            <planeGeometry args={[0.5, 2]} />
-            <meshStandardMaterial color="#ffffff" />
-          </mesh>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[4, 0.025, -2.8 + i * 0.8]}>
-            <planeGeometry args={[2, 0.5]} />
-            <meshStandardMaterial color="#ffffff" />
-          </mesh>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-4, 0.025, -2.8 + i * 0.8]}>
-            <planeGeometry args={[2, 0.5]} />
-            <meshStandardMaterial color="#ffffff" />
-          </mesh>
-        </group>
-      ))}
-
-      {/* Buildings with enhanced visuals */}
-      <Building position={[15, 0, 15]} height={9} color="#e8d8c8" />
-      <Building position={[-15, 0, 15]} height={7} color="#d4c8b8" />
-      <Building position={[15, 0, -15]} height={11} color="#c8b8a8" />
-      <Building position={[-15, 0, -15]} height={8} color="#f0e4d4" />
-      <Building position={[25, 0, 0]} height={6} color="#e0d0c0" />
-      <Building position={[-25, 0, 0]} height={10} color="#d0c0b0" />
-      <Building position={[0, 0, 25]} height={7} color="#e4d4c4" />
-      <Building position={[0, 0, -25]} height={9} color="#d8c8b8" />
-
-      {/* Street lamps */}
-      {lampPositions.map((pos, i) => (
-        <StreetLamp key={i} position={pos} />
-      ))}
+      {/* Buildings */}
+      <Building position={[15, 0, 15]} height={8} color="#e8d4c4" />
+      <Building position={[-15, 0, 15]} height={6} color="#d4c4b4" />
+      <Building position={[15, 0, -15]} height={10} color="#c4b4a4" />
+      <Building position={[-15, 0, -15]} height={7} color="#f0e0d0" />
+      <Building position={[25, 0, 0]} height={5} color="#ddd" />
+      <Building position={[-25, 0, 0]} height={9} color="#ccc" />
+      <Building position={[0, 0, 25]} height={6} color="#e0d0c0" />
+      <Building position={[0, 0, -25]} height={8} color="#d0c0b0" />
 
       {/* Trees */}
       {trees.map((pos, i) => (
